@@ -14,7 +14,7 @@ object ConcurrencyExample extends App with Setup {
   override def main(args: Array[String]): Unit = {
 
     val text = IOSource.fromResource("large_1.txt").mkString
-    val text1 = IOSource.fromResource("large_2.txt").mkString
+    val textCopy = new String(text)
     val clock = Clock.systemUTC()
     val maxRange = 100
 
@@ -46,7 +46,7 @@ object ConcurrencyExample extends App with Setup {
       val start = clock.instant()
       Source(1 to maxRange)
         .watchTermination()((_, f) => measureTime("second", start, f))
-        .map(_ => Gzip.compress(text1.getBytes))
+        .map(_ => Gzip.compress(textCopy.getBytes))
         .async
         .map(gzipped => Gzip.decompress(gzipped))
         .runWith(Sink.ignore)
